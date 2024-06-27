@@ -1,5 +1,5 @@
 import {categories} from "../data/data.ts";
-import {useState} from "react";
+import {FormEvent, useState} from "react";
 import {Activity} from "../types";
 
 const Form = () => {
@@ -11,13 +11,25 @@ const Form = () => {
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const isNumberField = ['category', 'calories'].includes(e.target.id)
         setActivity({
             ...activity,
-            [e.target.id]: e.target.value
+            [e.target.id]: isNumberField ? +e.target.value : e.target.value // el signo ´+ convierte a numero la cadena y gracias a eso pues se puede convertir
         })
     }
+
+    // valida lo que se ingresa en el input
+    const isValidActivity = () => {
+        const {name, calories} = activity
+        return name.trim() !== '' && calories > 0
+    }
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        console.log("Submit...")
+    }
     return (
-        <form className={"space-y-5 bg-white shadow p-10 rounded-lg"}>
+        <form className={"space-y-5 bg-white shadow p-10 rounded-lg"} onSubmit={handleSubmit}>
             <p>formulario</p>
             <div className={"grid grid-cols-1 gap-3"}>
                 <label htmlFor="category">Categoria:</label>
@@ -56,8 +68,9 @@ const Form = () => {
                 />
             </div>
             <input type="submit"
-                   className={"bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer"}
-                    value="Guardar comida o Guardar ejercicio"
+                   className={"bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer disabled:opacity-10"}
+                   value={activity.category === 1 ? "Guardar comida" : "Guadar ejercicio" }
+                   disabled={!isValidActivity()}
             />
         </form>
     );
