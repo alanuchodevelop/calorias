@@ -1,14 +1,24 @@
 import {categories} from "../data/data.ts";
-import {FormEvent, useState} from "react";
+import {Dispatch, FormEvent, useState} from "react";
+import {v4 as uuidv4} from "uuid";
 import {Activity} from "../types";
+import {ActivityActions} from "../reducers/activity-reducer.ts";
 
-const Form = () => {
+type FormProps = {
+    // children: React.ReactNode
+    dispatch: Dispatch<ActivityActions>
+}
 
-    const [activity, setActivity] = useState<Activity>({
-        category: 1,
-        name: '',
-        calories: 0
-    })
+const INITIAL_STATE: Activity = {
+    id: uuidv4(),
+    category: 1,
+    name: '',
+    calories: 0
+}
+
+const Form = ({dispatch} : FormProps) => {
+
+    const [activity, setActivity] = useState<Activity>(INITIAL_STATE)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const isNumberField = ['category', 'calories'].includes(e.target.id)
@@ -26,8 +36,17 @@ const Form = () => {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log("Submit...")
+        dispatch({
+            type: "save-activity",
+            payload: {newActivity: activity}
+        })
+
+        setActivity({
+            ...INITIAL_STATE,
+            id: uuidv4()
+        })
     }
+
     return (
         <form className={"space-y-5 bg-white shadow p-10 rounded-lg"} onSubmit={handleSubmit}>
             <p>formulario</p>
